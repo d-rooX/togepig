@@ -6,10 +6,10 @@ from pytz import utc
 from backup.manager import BackupManager
 from config import SETTINGS
 
-jobstores = {'default': RedisJobStore()}
-executors = {'default': ThreadPoolExecutor()}
+# jobstores = {'default': RedisJobStore()}
+# executors = {'default': ThreadPoolExecutor()}
 
-backup_scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, timezone=utc)
+backup_scheduler = BackgroundScheduler(timezone=utc) #jobstores=jobstores, executors=executors, timezone=utc)
 backup_manager = BackupManager(SETTINGS)
 
 
@@ -18,4 +18,4 @@ def do_backup():
     backup_manager.backup_database()
 
 
-backup_scheduler.start()
+# backup_scheduler.start()

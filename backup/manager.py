@@ -45,10 +45,10 @@ class BackupManager:
             os.mkdir(self.backup_path)
 
         if table_names is not None:
-            for x in table_names:
-                command_str = command_str + " -t " + x
+            for table in table_names:
+                command_str = command_str + " -t " + table
 
-        command_str = command_str + " -F c -b -v -f '" + self.backup_path + "/" + self.filename + "'"
+        command_str = f'{command_str} -F c -b -v -f "{self.backup_path}/{self.filename}"'
         try:
             os.system(command_str)
             logger.info("Backup completed")
@@ -63,7 +63,7 @@ class BackupManager:
             for x in table_names:
                 command_str = command_str + " -t " + x
 
-        command_str = command_str + " -v '" + self.backup_path + "/" + backup_name + "'"
+        command_str = f'command_str -v "{self.backup_path}/{backup_name}"'
 
         try:
             os.system(command_str)
@@ -90,10 +90,15 @@ class BackupManager:
 
         tables = []
         for row in os.popen(command_str).readlines():
-            r = tuple(map(lambda x: x.strip(), row.strip().split('|')))
+            r = tuple(
+                map(lambda x: x.strip(), row.strip().split('|'))
+            )
             if len(r) == 4:
                 schema, table_name, type, user = r
-                if schema == 'public' and type == 'table':
+                if schema == 'public' and (
+                        type == 'table' or
+                        type == 'таблица'
+                ):
                     tables.append(table_name)
 
         return tables
