@@ -1,1 +1,1 @@
-from . import browse_db
+from . import browse_db, settings

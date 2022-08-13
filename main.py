@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 import settings
@@ -7,7 +8,7 @@ from loguru import logger
 
 class ExceptionLogger(ExceptionHandler):
     def handle(self, exception):
-        logger.error(traceback.format_exception(exception))
+        logger.exception(exception)
 
 
 bot = TeleBot(
@@ -50,4 +51,4 @@ def start_handler(obj: types.Message | types.CallbackQuery):
         )
 
 
-bot.infinity_polling()
+bot.infinity_polling(logger_level=logging.DEBUG)

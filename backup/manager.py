@@ -6,7 +6,6 @@ from config import ROOT_DIR
 
 class BackupManager:
     def __init__(self, settings):
-        self.db_name = settings["db_name"]
         self.db_user = settings["db_user"]
         self.db_host = settings["db_host"]
         self.db_port = settings["db_port"]
@@ -20,7 +19,7 @@ class BackupManager:
 
     @property
     def credentials(self):
-        return " -h" + str(self.db_host) + " -p " + str(self.db_port) + " -d " + self.db_name + " -U " + self.db_user
+        return " -h" + str(self.db_host) + " -p " + str(self.db_port) + " -U " + self.db_user
 
     @property
     def filename(self) -> str:

@@ -1,4 +1,3 @@
-import telebot.util
 from telebot import types
 
 from backup.main import backup_manager
@@ -9,7 +8,10 @@ from settings import tables_to_backup, bot
 def choose_db(call: types.CallbackQuery):
     markup = types.InlineKeyboardMarkup(row_width=2)
     btns = []
-    for database in backup_manager.get_databases():
+
+
+    dbs = backup_manager.get_databases()
+    for database in dbs:
         btns.append(types.InlineKeyboardButton(
             database, callback_data=f'db_{database}'
         ))
