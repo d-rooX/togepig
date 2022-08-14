@@ -1,8 +1,10 @@
+import loguru
+from apscheduler.triggers.interval import IntervalTrigger
 from telebot import types
 
 import settings
-from backup.main import backup_manager
-from settings import tables_to_backup, bot
+from backup.main import backup_scheduler
+from settings import bot
 
 
 def get_current_interval_button():
@@ -30,6 +32,8 @@ def settings_cb(call: types.CallbackQuery):
     markup = types.InlineKeyboardMarkup().row(
         get_current_interval_button(),
         types.InlineKeyboardButton('DB Credentials', callback_data='creds')
+    ).row(
+        types.InlineKeyboardButton('Back', callback_data='menu')
     )
 
     bot.edit_message_text(
@@ -49,6 +53,9 @@ def interval_onclick(call: types.CallbackQuery):
             settings.interval = 6
         case '1d':
             settings.interval = 24
+
+    backup_scheduler.reschedule_job('do_backup', trigger=IntervalTrigger(hours=settings.interval))
+    loguru.logger.debug(backup_scheduler.get_job('do_backup'))
     settings_cb(call)
 
 

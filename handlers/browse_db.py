@@ -1,14 +1,13 @@
 from telebot import types
 
 from backup.main import backup_manager
-from settings import tables_to_backup, bot
+from settings import bot, backup_databases
 
 
 @bot.callback_query_handler(lambda c: c.data == 'browse')
 def choose_db(call: types.CallbackQuery):
     markup = types.InlineKeyboardMarkup(row_width=2)
     btns = []
-
 
     dbs = backup_manager.get_databases()
     for database in dbs:
@@ -59,21 +58,21 @@ def onclick_table(call: types.CallbackQuery):
 
     if table == '*':
         tables = backup_manager.get_tables(db)
-        if tables_to_backup.get(db) != set(tables):
-            tables_to_backup[db] = set(
+        if backup_databases.get(db) != set(tables):
+            backup_databases[db] = set(
                 table for table in tables
             )
         else:
-            tables_to_backup[db] = set()
+            backup_databases[db] = set()
     else:
-        tables_to_backup.setdefault(
+        backup_databases.setdefault(
             db, set()
         ).symmetric_difference_update({table})
     choose_table(call, after_click=True)
 
 
 def table_name(db_name, table):
-    return f'✅ {table}' if table in tables_to_backup.get(db_name, {}) else table
+    return f'✅ {table}' if table in backup_databases.get(db_name, {}) else table
 
 
 def get_tables_markup(db_name: str) -> list[types.InlineKeyboardButton]:

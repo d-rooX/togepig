@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 from loguru import logger
 import os
@@ -23,7 +24,7 @@ class BackupManager:
 
     @property
     def filename(self) -> str:
-        return self.filename + "-" + time.strftime("%d%m%Y%H%M%S") + ".backup"
+        return self._filename + "-" + datetime.now().strftime("%d%m%Y%H%M%S") + ".backup"
 
     @filename.setter
     def filename(self, value: str):
@@ -37,23 +38,25 @@ class BackupManager:
     def backup_path(self, value):
         self._backup_path = value
 
-    def backup_database(self, table_names=None):
+    def backup_database(self, databases=None):
         command_str = "pg_dump" + self.credentials
 
         if not os.path.exists(self.backup_path):
             os.mkdir(self.backup_path)
 
-        if table_names is not None:
-            for table in table_names:
-                command_str = command_str + " -t " + table
+        if databases:
+            for db in databases:
+                command_str += " -d " + db
+                for table in databases[db]:
+                    command_str += ' -t ' + table
 
-        command_str = f'{command_str} -F c -b -v -f "{self.backup_path}/{self.filename}"'
-        try:
-            os.system(command_str)
-            logger.info("Backup completed")
-        except Exception as e:
-            logger.error("Error while doing backup")
-            logger.error(f'{e.__class__.__name__}: {e}')
+                command_str += f' -F c -b -v -f "{self.backup_path}/{self.filename}"'
+                try:
+                    os.system(command_str)
+                    logger.info(f"Backup of '{db}' completed")
+                except Exception as e:
+                    logger.error("Error while doing backup")
+                    logger.error(f'{e.__class__.__name__}: {e}')
 
     def restore_database(self, backup_name, table_names=None):
         command_str = "pg_restore" + self.credentials
